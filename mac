@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 fancy_echo() {
   local fmt="$1"; shift
@@ -25,6 +25,12 @@ append_to_zshrc() {
 }
 
 setup_zsh() {
+  if [ -d "$HOME/.oh-my-zsh" ]; then
+    echo "zsh already installed"
+  else
+    curl -L http://install.ohmyz.sh | sh
+  fi
+
   if [ ! -d "$HOME/.bin/" ]; then
     mkdir "$HOME/.bin"
   fi
@@ -79,19 +85,10 @@ brew_expand_alias() {
   brew info "$1" 2>/dev/null | head -1 | awk '{gsub(/:/, ""); print $1}'
 }
 
-brew_launchctl_restart() {
+brew_services_start() {
   local name="$(brew_expand_alias "$1")"
-  local domain="homebrew.mxcl.$name"
-  local plist="$domain.plist"
-
   fancy_echo "Restarting %s ..." "$1"
-  mkdir -p "$HOME/Library/LaunchAgents"
-  ln -sfv "/usr/local/opt/$name/$plist" "$HOME/Library/LaunchAgents"
-
-  if launchctl list | grep -Fq "$domain"; then
-    launchctl unload "$HOME/Library/LaunchAgents/$plist" >/dev/null
-  fi
-  launchctl load "$HOME/Library/LaunchAgents/$plist" >/dev/null
+  brew services start $name
 }
 
 gem_install_or_update() {
@@ -102,6 +99,15 @@ gem_install_or_update() {
     fancy_echo "Installing %s ..." "$1"
     gem install "$@"
     rbenv rehash
+  fi
+}
+
+
+setup_ssh() {
+  if [ -w "$HOME/.ssh/id_rsa" ]; then
+    echo "ssh key already exists"
+  else
+    ssh-keygen
   fi
 }
 
@@ -128,12 +134,12 @@ setup_homebrew() {
 setup_xcode() {
   echo "installing xcode tools"
   xcode-select --install || true
+  xcode-select -v
 }
 
 trap 'ret=$?; test $ret -ne 0 && printf "failed\n\n" >&2; exit $ret' EXIT
 set -e
-sudo ls
-# TODO: setup ssh tokens
+setup_ssh
 setup_xcode
 setup_zsh
 setup_homebrew
@@ -143,13 +149,13 @@ brew_tap 'mongodb/brew'
 brew_install_or_upgrade 'cask'
 brew_install_or_upgrade 'git'
 brew_install_or_upgrade 'redis'
-brew_launchctl_restart 'redis'
+brew_services_start 'redis'
 brew_install_or_upgrade 'vim'
 brew_install_or_upgrade 'node'
 brew_install_or_upgrade 'openssl'
 brew unlink openssl && brew link openssl --force
 brew_install_or_upgrade 'mongodb-community'
-brew_launchctl_restart 'mongodb'
+brew_services_start 'mongodb-community'
 brew_install_or_upgrade 'tree'
 brew_install_or_upgrade 'git-flow'
 brew_install_or_upgrade 'gnuplot'
@@ -165,7 +171,6 @@ brew_install_or_upgrade 'emacs'
 brew_install_or_upgrade 'r'
 brew_install_or_upgrade 's3cmd'
 brew_install_or_upgrade 'awscli'
-brew_install_or_upgrade 'chromedriver'
 
 brew cask install xquartz
 brew cask install google-chrome
@@ -178,10 +183,8 @@ brew cask install iterm2
 brew cask install slack
 brew cask install lastpass
 brew cask install atom
-brew cask install chromecast
-brew linkapps
-
-curl -L http://install.ohmyz.sh | sh
+brew cask install chromedriver
+brew cask install intellij-idea
 
 append_to_zshrc 'plugins=(aws common-aliases git git-flow mvn npm pod osxscreen gradle)'
 append_to_zshrc 'export JAVA_HOME=$(/usr/libexec/java_home)'
