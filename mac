@@ -7,21 +7,22 @@ fancy_echo() {
 
 append_to_zshrc() {
   local text="$1" zshrc
-  local skip_new_line="$2"
-
-  if [ -w "$HOME/.zshrc.local" ]; then
-    zshrc="$HOME/.zshrc.local"
-  else
-    zshrc="$HOME/.zshrc"
-  fi
+  zshrc="$HOME/.zshrc"
 
   if ! grep -Fqs "$text" "$zshrc"; then
-    if [ "$skip_new_line" -eq 1 ]; then
-      printf "%s\n" "$text" >> "$zshrc"
-    else
       printf "\n%s\n" "$text" >> "$zshrc"
-    fi
   fi
+}
+
+setup_ruby() {
+  gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+  curl -sSL https://get.rvm.io | bash
+  rvm get stable --auto-dotfiles
+}
+
+setup_node() {
+  brew_install_or_upgrade 'nvm'
+  # TODO install specific node verion/npm etc.
 }
 
 setup_zsh() {
@@ -137,12 +138,15 @@ setup_xcode() {
   xcode-select -v
 }
 
+#beginning of runnign code
 trap 'ret=$?; test $ret -ne 0 && printf "failed\n\n" >&2; exit $ret' EXIT
 set -e
 setup_ssh
 setup_xcode
 setup_zsh
 setup_homebrew
+setup_ruby
+setup_node
 
 brew_tap 'mongodb/brew'
 
@@ -151,9 +155,7 @@ brew_install_or_upgrade 'git'
 brew_install_or_upgrade 'redis'
 brew_services_start 'redis'
 brew_install_or_upgrade 'vim'
-brew_install_or_upgrade 'node'
 brew_install_or_upgrade 'openssl'
-brew unlink openssl && brew link openssl --force
 brew_install_or_upgrade 'mongodb-community'
 brew_services_start 'mongodb-community'
 brew_install_or_upgrade 'tree'
@@ -197,7 +199,3 @@ append_to_zshrc 'export VISUAL=vim'
 append_to_zshrc 'setopt SHARE_HISTORY'
 append_to_zshrc 'setopt EXTENDED_HISTORY'
 append_to_zshrc 'export PATH=/usr/local/bin:$PATH'
-
-if [ -f "$HOME/.laptop.local" ]; then
-  . "$HOME/.laptop.local"
-fi
