@@ -10,9 +10,6 @@ It installs, upgrades, or skips packages based on what is already installed on t
 Use
 -------
 
-Download, review, then execute the script:
-
-```sh
-curl --remote-name https://raw.githubusercontent.com/pvertenten/laptop/master/mac
-./mac
+```
+curl -sSL https://raw.githubusercontent.com/pvertenten/laptop/master/mac | bash
 ```
