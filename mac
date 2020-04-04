@@ -1,0 +1,200 @@
+#!/bin/sh
+
+fancy_echo() {
+  local fmt="$1"; shift
+  printf "\n$fmt\n" "$@"
+}
+
+append_to_zshrc() {
+  local text="$1" zshrc
+  local skip_new_line="$2"
+
+  if [ -w "$HOME/.zshrc.local" ]; then
+    zshrc="$HOME/.zshrc.local"
+  else
+    zshrc="$HOME/.zshrc"
+  fi
+
+  if ! grep -Fqs "$text" "$zshrc"; then
+    if [ "$skip_new_line" -eq 1 ]; then
+      printf "%s\n" "$text" >> "$zshrc"
+    else
+      printf "\n%s\n" "$text" >> "$zshrc"
+    fi
+  fi
+}
+
+setup_zsh() {
+  if [ ! -d "$HOME/.bin/" ]; then
+    mkdir "$HOME/.bin"
+  fi
+
+  if [ ! -f "$HOME/.zshrc" ]; then
+    touch "$HOME/.zshrc"
+  fi
+
+  append_to_zshrc 'export PATH="$HOME/.bin:$PATH"'
+
+  case "$SHELL" in
+    */zsh) : ;;
+    *)
+      fancy_echo "Changing your shell to zsh ..."
+        chsh -s "$(which zsh)"
+      ;;
+  esac
+}
+
+brew_install_or_upgrade() {
+  if brew_is_installed "$1"; then
+    if brew_is_upgradable "$1"; then
+      fancy_echo "Upgrading %s ..." "$1"
+      brew upgrade "$@"
+    else
+      fancy_echo "Already using the latest version of %s. Skipping ..." "$1"
+    fi
+  else
+    fancy_echo "Installing %s ..." "$1"
+    brew install "$@"
+  fi
+}
+
+brew_is_installed() {
+  local name="$(brew_expand_alias "$1")"
+
+  brew list -1 | grep -Fqx "$name"
+}
+
+brew_is_upgradable() {
+  local name="$(brew_expand_alias "$1")"
+
+  ! brew outdated --quiet "$name" >/dev/null
+}
+
+brew_tap() {
+  echo "brew tap $1"
+  brew tap "$1"
+}
+
+brew_expand_alias() {
+  brew info "$1" 2>/dev/null | head -1 | awk '{gsub(/:/, ""); print $1}'
+}
+
+brew_launchctl_restart() {
+  local name="$(brew_expand_alias "$1")"
+  local domain="homebrew.mxcl.$name"
+  local plist="$domain.plist"
+
+  fancy_echo "Restarting %s ..." "$1"
+  mkdir -p "$HOME/Library/LaunchAgents"
+  ln -sfv "/usr/local/opt/$name/$plist" "$HOME/Library/LaunchAgents"
+
+  if launchctl list | grep -Fq "$domain"; then
+    launchctl unload "$HOME/Library/LaunchAgents/$plist" >/dev/null
+  fi
+  launchctl load "$HOME/Library/LaunchAgents/$plist" >/dev/null
+}
+
+gem_install_or_update() {
+  if gem list "$1" --installed > /dev/null; then
+    fancy_echo "Updating %s ..." "$1"
+    gem update "$@"
+  else
+    fancy_echo "Installing %s ..." "$1"
+    gem install "$@"
+    rbenv rehash
+  fi
+}
+
+setup_homebrew() {
+  if ! command -v brew >/dev/null; then
+    fancy_echo "Installing Homebrew ..."
+      curl -fsS \
+        'https://raw.githubusercontent.com/Homebrew/install/master/install' | ruby
+
+      append_to_zshrc '# recommended by brew doctor'
+
+      # shellcheck disable=SC2016
+      append_to_zshrc 'export PATH="/usr/local/bin:$PATH"' 1
+
+      export PATH="/usr/local/bin:$PATH"
+  else
+    fancy_echo "Homebrew already installed. Skipping ..."
+  fi
+
+  fancy_echo "Updating Homebrew formulas ..."
+  brew update
+}
+
+setup_xcode() {
+  echo "installing xcode tools"
+  xcode-select --install || true
+}
+
+trap 'ret=$?; test $ret -ne 0 && printf "failed\n\n" >&2; exit $ret' EXIT
+set -e
+sudo ls
+# TODO: setup ssh tokens
+setup_xcode
+setup_zsh
+setup_homebrew
+
+brew_tap 'mongodb/brew'
+
+brew_install_or_upgrade 'cask'
+brew_install_or_upgrade 'git'
+brew_install_or_upgrade 'redis'
+brew_launchctl_restart 'redis'
+brew_install_or_upgrade 'vim'
+brew_install_or_upgrade 'node'
+brew_install_or_upgrade 'openssl'
+brew unlink openssl && brew link openssl --force
+brew_install_or_upgrade 'mongodb-community'
+brew_launchctl_restart 'mongodb'
+brew_install_or_upgrade 'tree'
+brew_install_or_upgrade 'git-flow'
+brew_install_or_upgrade 'gnuplot'
+brew_install_or_upgrade 'libpng'
+brew_install_or_upgrade 'wget'
+brew_install_or_upgrade 'cmake'
+brew_install_or_upgrade 'lynx'
+brew_install_or_upgrade 'readline'
+brew_install_or_upgrade 'gettext'
+brew_install_or_upgrade 'sqlite'
+brew_install_or_upgrade 'htop-osx'
+brew_install_or_upgrade 'emacs'
+brew_install_or_upgrade 'r'
+brew_install_or_upgrade 's3cmd'
+brew_install_or_upgrade 'awscli'
+brew_install_or_upgrade 'chromedriver'
+
+brew cask install xquartz
+brew cask install google-chrome
+brew cask install zoom
+brew cask install firefox
+brew cask install java
+brew cask install google-hangouts
+brew cask install disk-inventory-x
+brew cask install iterm2
+brew cask install slack
+brew cask install lastpass
+brew cask install atom
+brew cask install chromecast
+brew linkapps
+
+curl -L http://install.ohmyz.sh | sh
+
+append_to_zshrc 'plugins=(aws common-aliases git git-flow mvn npm pod osxscreen gradle)'
+append_to_zshrc 'export JAVA_HOME=$(/usr/libexec/java_home)'
+append_to_zshrc 'export LC_CTYPE=en_US.UTF-8'
+append_to_zshrc 'export LANGUAGE=en_US.UTF-8'
+append_to_zshrc 'export LANG=en_US.UTF-8'
+append_to_zshrc 'export LC_ALL=en_US.UTF-8'
+append_to_zshrc 'export EDITOR=vim'
+append_to_zshrc 'export VISUAL=vim'
+append_to_zshrc 'setopt SHARE_HISTORY'
+append_to_zshrc 'setopt EXTENDED_HISTORY'
+append_to_zshrc 'export PATH=/usr/local/bin:$PATH'
+
+if [ -f "$HOME/.laptop.local" ]; then
+  . "$HOME/.laptop.local"
+fi
