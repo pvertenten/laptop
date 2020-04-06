@@ -15,6 +15,7 @@ append_to_zshrc() {
 }
 
 setup_ruby() {
+  brew_install_or_upgrade 'gpg'
   gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
   curl -sSL https://get.rvm.io | bash
   rvm get stable --auto-dotfiles
@@ -23,6 +24,10 @@ setup_ruby() {
 setup_node() {
   brew_install_or_upgrade 'nvm'
   # TODO install specific node verion/npm etc.
+}
+
+setup_java() {
+  brew_install_or_upgrade 'jabba'
 }
 
 setup_zsh() {
@@ -115,9 +120,7 @@ setup_ssh() {
 setup_homebrew() {
   if ! command -v brew >/dev/null; then
     fancy_echo "Installing Homebrew ..."
-      curl -fsS \
-        'https://raw.githubusercontent.com/Homebrew/install/master/install' | ruby
-
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
       append_to_zshrc '# recommended by brew doctor'
 
       # shellcheck disable=SC2016
@@ -145,8 +148,6 @@ setup_ssh
 setup_xcode
 setup_homebrew
 setup_zsh
-setup_ruby
-setup_node
 
 brew_tap 'mongodb/brew'
 
@@ -178,12 +179,11 @@ brew cask install xquartz
 brew cask install google-chrome
 brew cask install zoom
 brew cask install firefox
-brew cask install java
 brew cask install google-hangouts
 brew cask install disk-inventory-x
 brew cask install iterm2
 brew cask install slack
-brew cask install lastpass
+brew cask install authy
 brew cask install atom
 brew cask install chromedriver
 brew cask install intellij-idea
