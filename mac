@@ -148,6 +148,7 @@ setup_ssh
 setup_xcode
 setup_homebrew
 setup_zsh
+setup_java
 
 brew_tap 'mongodb/brew'
 
