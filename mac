@@ -14,6 +14,20 @@ append_to_zshrc() {
   fi
 }
 
+setup_host() {
+  if [ ! -f "$HOME/.host" ]; then
+    host=''
+    while [[ $host == '' ]]
+    do
+      read -p "Set your hostname to something sensible ie (peterslaptop): " host
+    done
+    echo "Goign to setup hostname to: $host"
+    sudo scutil --set HostName $host
+    sudo sh -c "echo '127.0.0.1 $host\n::1 $host' >> /etc/hosts"
+    echo $host > ~/.host
+  fi
+}
+
 setup_ruby() {
   brew_install_or_upgrade 'gpg'
   gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
@@ -145,62 +159,74 @@ setup_xcode() {
   xcode-select -v
 }
 
+setup_software() {
+  brew_tap 'mongodb/brew'
+
+  brew_install_or_upgrade 'cask'
+  brew_install_or_upgrade 'git'
+  brew_install_or_upgrade 'redis'
+  brew_services_start 'redis'
+  brew_install_or_upgrade 'vim'
+  brew_install_or_upgrade 'openssl'
+  brew_install_or_upgrade 'mongodb-community'
+  brew_services_start 'mongodb-community'
+  brew_install_or_upgrade 'tree'
+  brew_install_or_upgrade 'git-flow'
+  brew_install_or_upgrade 'gnuplot'
+  brew_install_or_upgrade 'libpng'
+  brew_install_or_upgrade 'wget'
+  brew_install_or_upgrade 'cmake'
+  brew_install_or_upgrade 'lynx'
+  brew_install_or_upgrade 'readline'
+  brew_install_or_upgrade 'gettext'
+  brew_install_or_upgrade 'sqlite'
+  brew_install_or_upgrade 'htop-osx'
+  brew_install_or_upgrade 'emacs'
+  brew_install_or_upgrade 'r'
+  brew_install_or_upgrade 's3cmd'
+  brew_install_or_upgrade 'awscli'
+  brew_install_or_upgrade 'pinentry-mac'
+  brew_install_or_upgrade 'python'
+
+  brew cask install xquartz
+  brew cask install google-chrome
+  brew cask install zoom
+  brew cask install firefox
+  brew cask install google-hangouts
+  brew cask install disk-inventory-x
+  brew cask install iterm2
+  brew cask install slack
+  brew cask install authy
+  brew cask install atom
+  brew cask install chromedriver
+  brew cask install ngrok
+  brew cask install intellij-idea
+  brew cask install discord
+}
+
+setup_env() {
+  append_to_zshrc 'plugins=(aws common-aliases git git-flow mvn npm pod osxscreen gradle)'
+  append_to_zshrc 'export LC_CTYPE=en_US.UTF-8'
+  append_to_zshrc 'export LANGUAGE=en_US.UTF-8'
+  append_to_zshrc 'export LANG=en_US.UTF-8'
+  append_to_zshrc 'export LC_ALL=en_US.UTF-8'
+  append_to_zshrc 'export EDITOR=vim'
+  append_to_zshrc 'export VISUAL=vim'
+  append_to_zshrc 'setopt SHARE_HISTORY'
+  append_to_zshrc 'setopt EXTENDED_HISTORY'
+  append_to_zshrc 'export PATH=/usr/local/bin:$PATH'
+  append_to_zshrc 'export GPG_TTY=$(tty)'
+
+}
+
 #beginning of runnign code
 trap 'ret=$?; test $ret -ne 0 && printf "failed\n\n" >&2; exit $ret' EXIT
 set -e
+setup_host
 setup_ssh
 setup_xcode
 setup_homebrew
 setup_zsh
 setup_java
-
-brew_tap 'mongodb/brew'
-
-brew_install_or_upgrade 'cask'
-brew_install_or_upgrade 'git'
-brew_install_or_upgrade 'redis'
-brew_services_start 'redis'
-brew_install_or_upgrade 'vim'
-brew_install_or_upgrade 'openssl'
-brew_install_or_upgrade 'mongodb-community'
-brew_services_start 'mongodb-community'
-brew_install_or_upgrade 'tree'
-brew_install_or_upgrade 'git-flow'
-brew_install_or_upgrade 'gnuplot'
-brew_install_or_upgrade 'libpng'
-brew_install_or_upgrade 'wget'
-brew_install_or_upgrade 'cmake'
-brew_install_or_upgrade 'lynx'
-brew_install_or_upgrade 'readline'
-brew_install_or_upgrade 'gettext'
-brew_install_or_upgrade 'sqlite'
-brew_install_or_upgrade 'htop-osx'
-brew_install_or_upgrade 'emacs'
-brew_install_or_upgrade 'r'
-brew_install_or_upgrade 's3cmd'
-brew_install_or_upgrade 'awscli'
-
-brew cask install xquartz
-brew cask install google-chrome
-brew cask install zoom
-brew cask install firefox
-brew cask install google-hangouts
-brew cask install disk-inventory-x
-brew cask install iterm2
-brew cask install slack
-brew cask install authy
-brew cask install atom
-brew cask install chromedriver
-brew cask install ngrok
-brew cask install intellij-idea
-
-append_to_zshrc 'plugins=(aws common-aliases git git-flow mvn npm pod osxscreen gradle)'
-append_to_zshrc 'export LC_CTYPE=en_US.UTF-8'
-append_to_zshrc 'export LANGUAGE=en_US.UTF-8'
-append_to_zshrc 'export LANG=en_US.UTF-8'
-append_to_zshrc 'export LC_ALL=en_US.UTF-8'
-append_to_zshrc 'export EDITOR=vim'
-append_to_zshrc 'export VISUAL=vim'
-append_to_zshrc 'setopt SHARE_HISTORY'
-append_to_zshrc 'setopt EXTENDED_HISTORY'
-append_to_zshrc 'export PATH=/usr/local/bin:$PATH'
+setup_software
+setup_env
