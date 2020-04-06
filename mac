@@ -236,5 +236,5 @@ setup_zsh
 setup_java
 setup_ruby
 setup_node
-# setup_software
+setup_software
 setup_env
