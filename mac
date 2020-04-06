@@ -30,14 +30,24 @@ setup_host() {
 
 setup_ruby() {
   brew_install_or_upgrade 'gpg'
-  gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+  gpg --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
   curl -sSL https://get.rvm.io | bash
-  rvm get stable --auto-dotfiles
+  source $HOME/.rvm/scripts/rvm
+  rvm reload
+  rvm install 2.7.1
 }
 
 setup_node() {
   brew_install_or_upgrade 'nvm'
-  # TODO install specific node verion/npm etc.
+  mkdir -p ~/.nvm
+  append_to_zshrc 'export NVM_DIR="$HOME/.nvm"'
+  append_to_zshrc '[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"'
+  append_to_zshrc '[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"'
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"
+  [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"
+  nvm install 10.15.1
+  npm install -g npm@6.4.1
 }
 
 setup_java() {
@@ -227,5 +237,7 @@ setup_xcode
 setup_homebrew
 setup_zsh
 setup_java
-setup_software
+setup_ruby
+setup_node
+# setup_software
 setup_env
