@@ -42,16 +42,15 @@ setup_node() {
   mkdir -p ~/.nvm
   append_to_zshrc 'export NVM_DIR="$HOME/.nvm"'
   append_to_zshrc '[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"'
-  append_to_zshrc '[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"'
   export NVM_DIR="$HOME/.nvm"
   [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"
-  [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"
   nvm install 10.15.1
   npm install -g npm@6.4.1
 }
 
 setup_java() {
-  brew_install_or_upgrade 'jabba'
+  curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | bash && . ~/.jabba/jabba.sh
+  [ -s "$JABBA_HOME/jabba.sh" ] && source "$JABBA_HOME/jabba.sh"
   jabba install adopt@1.11.0-4
   jabba install adopt@1.8.0-232
   jabba alias default adopt@1.11.0-4
@@ -178,8 +177,6 @@ setup_software() {
   brew_services_start 'redis'
   brew_install_or_upgrade 'vim'
   brew_install_or_upgrade 'openssl'
-  brew_install_or_upgrade 'mongodb-community'
-  brew_services_start 'mongodb-community'
   brew_install_or_upgrade 'tree'
   brew_install_or_upgrade 'git-flow'
   brew_install_or_upgrade 'gnuplot'
