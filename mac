@@ -184,7 +184,6 @@ setup_software() {
   brew_install_or_upgrade 'emacs'
   brew_install_or_upgrade 'r'
   brew_install_or_upgrade 's3cmd'
-  brew_install_or_upgrade 'awscli'
   brew_install_or_upgrade 'pinentry-mac'
   brew_install_or_upgrade 'python'
 
