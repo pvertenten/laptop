@@ -28,7 +28,10 @@ setup_node() {
 
 setup_java() {
   brew_install_or_upgrade 'jabba'
-  jabba install 1.13.0-2
+  jabba install adopt@1.11.0-4
+  jabba install adopt@1.8.0-232
+  jabba alias default adopt@1.11.0-4
+  jabba use default
 }
 
 setup_zsh() {
@@ -188,6 +191,7 @@ brew cask install slack
 brew cask install authy
 brew cask install atom
 brew cask install chromedriver
+brew cask install ngrok
 brew cask install intellij-idea
 
 append_to_zshrc 'plugins=(aws common-aliases git git-flow mvn npm pod osxscreen gradle)'
