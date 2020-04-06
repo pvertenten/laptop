@@ -208,6 +208,7 @@ setup_software() {
   brew cask install ngrok
   brew cask install intellij-idea
   brew cask install discord
+  brew cask install rectangle
 }
 
 setup_env() {
