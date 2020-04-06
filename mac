@@ -222,7 +222,6 @@ setup_env() {
   append_to_zshrc 'setopt EXTENDED_HISTORY'
   append_to_zshrc 'export PATH=/usr/local/bin:$PATH'
   append_to_zshrc 'export GPG_TTY=$(tty)'
-
 }
 
 #beginning of runnign code
