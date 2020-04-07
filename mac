@@ -166,6 +166,12 @@ setup_xcode() {
   echo "installing xcode tools"
   xcode-select --install || true
   xcode-select -v
+  sudo xcodebuild -license accept
+}
+
+setup_bazel() {
+  brew tap bazelbuild/tap
+  brew_install_or_upgrade 'bazelbuild/tap/bazel'
 }
 
 setup_software() {
@@ -192,6 +198,7 @@ setup_software() {
   brew_install_or_upgrade 'r'
   brew_install_or_upgrade 's3cmd'
   brew_install_or_upgrade 'pinentry-mac'
+  brew_install_or_upgrade 'python'
   brew_install_or_upgrade 'python'
 
   brew cask install xquartz
@@ -236,5 +243,6 @@ setup_zsh
 setup_java
 setup_ruby
 setup_node
+setup_bazel
 setup_software
 setup_env
