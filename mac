@@ -170,6 +170,7 @@ setup_xcode() {
 }
 
 setup_bazel() {
+  brew cask install homebrew/cask-versions/adoptopenjdk8
   brew tap bazelbuild/tap
   brew_install_or_upgrade 'bazelbuild/tap/bazel'
 }
