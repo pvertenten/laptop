@@ -219,6 +219,7 @@ setup_software() {
   brew cask install virtualbox
   brew cask install vagrant
   brew cask install vagrant-manager
+  brew cask install cloudapp
 }
 
 setup_mongo() {
