@@ -176,8 +176,6 @@ setup_bazel() {
 }
 
 setup_software() {
-  brew_tap 'mongodb/brew'
-
   brew_install_or_upgrade 'cask'
   brew_install_or_upgrade 'git'
   brew_install_or_upgrade 'redis'
@@ -217,6 +215,18 @@ setup_software() {
   brew cask install intellij-idea
   brew cask install discord
   brew cask install rectangle
+  brew cask install virtualbox
+  brew cask install vagrant
+  brew cask install vagrant-manager
+}
+
+setup_mongo() {
+  sudo mkdir -p /usr/local/m/versions
+  sudo chown -R $USER /usr/local/m
+  npm install -g m
+  mkdir -p /data/db
+  m 3.6
+  m 4.2
 }
 
 setup_env() {
@@ -246,4 +256,5 @@ setup_ruby
 setup_node
 setup_bazel
 setup_software
+setup_mongo
 setup_env
