@@ -188,6 +188,7 @@ setup_software() {
   brew_install_or_upgrade 'libpng'
   brew_install_or_upgrade 'wget'
   brew_install_or_upgrade 'cmake'
+  brew_install_or_upgrade 'telnet'
   brew_install_or_upgrade 'lynx'
   brew_install_or_upgrade 'readline'
   brew_install_or_upgrade 'gettext'
@@ -221,6 +222,7 @@ setup_software() {
 }
 
 setup_mongo() {
+  brew cask install mongodb-compass
   sudo mkdir -p /usr/local/m/versions
   sudo chown -R $USER /usr/local/m
   npm install -g m
