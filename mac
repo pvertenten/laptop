@@ -229,6 +229,18 @@ setup_mongo() {
   m 4.2
 }
 
+setup_python() {
+  sudo python -m ensurepip --upgrade
+  sudo pip install virtualenv
+  sudo pip install --upgrade pymongo
+  sudo pip install --upgrade psutil
+  sudo pip3 install mtools[all]
+}
+
+setup_nhtt() {
+  npm install -g mgeneratejs
+}
+
 setup_env() {
   append_to_zshrc 'plugins=(aws common-aliases git git-flow mvn npm pod osxscreen gradle)'
   append_to_zshrc 'export LC_CTYPE=en_US.UTF-8'
@@ -256,5 +268,7 @@ setup_ruby
 setup_node
 setup_bazel
 setup_software
+setup_python
+setup_nhtt
 setup_mongo
 setup_env
