@@ -44,8 +44,8 @@ setup_node() {
   append_to_zshrc '[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"'
   export NVM_DIR="$HOME/.nvm"
   [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"
-  nvm install 10.15.1
-  npm install -g npm@6.4.1
+  nvm install 12.13.0
+  npm install -g npm@6.12.0
 }
 
 setup_java() {
@@ -200,6 +200,7 @@ setup_software() {
   brew_install_or_upgrade 'pinentry-mac'
   brew_install_or_upgrade 'python'
   brew_install_or_upgrade 'python'
+  brew_install_or_upgrade 'go'
 
   brew cask install xquartz
   brew cask install google-chrome
