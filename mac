@@ -178,6 +178,7 @@ setup_bazel() {
 setup_software() {
   brew_install_or_upgrade 'cask'
   brew_install_or_upgrade 'git'
+  brew_install_or_upgrade 'git-gui'
   brew_install_or_upgrade 'redis'
   brew_services_start 'redis'
   brew_install_or_upgrade 'vim'
@@ -200,7 +201,7 @@ setup_software() {
   brew_install_or_upgrade 'pinentry-mac'
   brew_install_or_upgrade 'python'
   brew_install_or_upgrade 'python'
-  brew_install_or_upgrade 'go'
+  brew_install_or_upgrade 'go@1.13'
 
   brew cask install xquartz
   brew cask install google-chrome
