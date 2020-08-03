@@ -58,6 +58,7 @@ setup_java() {
 }
 
 setup_zsh() {
+  brew_install_or_upgrade 'zsh'
   if [ -d "$HOME/.oh-my-zsh" ]; then
     echo "zsh already installed"
   else
@@ -222,6 +223,7 @@ setup_software() {
   brew cask install vagrant
   brew cask install vagrant-manager
   brew cask install cloudapp
+  brew cask install visualvm
 }
 
 setup_mongo() {
